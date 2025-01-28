@@ -1,5 +1,6 @@
 package com.abhisek.manga.app.data
 
+import com.abhisek.manga.app.data.local.mapper.toDomain
 import com.abhisek.manga.app.data.local.repository.IMangaLocalRepository
 import com.abhisek.manga.app.data.remote.repository.IMangaRemoteRepository
 import com.abhisek.manga.app.domain.mapper.toEntity
@@ -12,17 +13,30 @@ class MangaRepository @Inject constructor(
     private val mangaLocalRepository: IMangaLocalRepository,
 ) : IMangaRepository {
     override suspend fun getMangaList(): Result<List<Manga>> {
-        val remoteResult = mangaRemoteRepository.getMangaList()
-        if (remoteResult.isSuccess) {
-            remoteResult.getOrNull()?.let { remoteData ->
-                val mangaEntities = remoteData.map { it.toEntity() }
-                mangaLocalRepository.insertMangaList(mangaEntities)
-                return remoteResult
-            } ?: kotlin.run {
-                return mangaLocalRepository.getMangaList()
+        try {
+            val remoteResult = mangaRemoteRepository.getMangaList()
+            val localResult = mangaLocalRepository.getMangaList()
+            if (remoteResult.isSuccess) {
+                remoteResult.getOrNull()?.let { remoteData ->
+                    val localData =
+                        if (localResult.isSuccess) localResult.getOrNull().orEmpty() else emptyList()
+                    val mangaEntities = remoteData.map { remoteManga ->
+                        val localManga = localData.find { it.id == remoteManga.id }
+                        remoteManga.toEntity().copy(
+                            isFavorite = localManga?.isFavorite ?: false,
+                            isRead = localManga?.isRead ?: false
+                        )
+                    }
+                    mangaLocalRepository.insertMangaList(mangaEntities)
+                    return Result.success(mangaEntities.map { it.toDomain() })
+                } ?: run {
+                    return localResult
+                }
+            } else {
+                return localResult
             }
-        } else {
-            return mangaLocalRepository.getMangaList()
+        } catch (e: Exception) {
+            return Result.failure(e)
         }
     }
 }
