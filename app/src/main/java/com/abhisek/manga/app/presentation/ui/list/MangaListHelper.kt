@@ -1,5 +1,6 @@
 package com.abhisek.manga.app.presentation.ui.list
 
+import com.abhisek.manga.app.core.util.epochToYear
 import com.abhisek.manga.app.domain.model.Manga
 
 sealed class MangaListAction {
@@ -10,11 +11,21 @@ sealed class MangaListAction {
 }
 
 data class MangaListState(
-    val mangaList: List<Manga>? = null,
-    val sort: Sort? = null,
+    val mangaContent: List<MangaContent>? = null,
 )
 
-enum class Sort {
-    POPULARITY,
-    SCORE,
+data class MangaContent(
+    val year : Int,
+    val mangaList: List<Manga>,
+)
+
+fun List<Manga>.toMangaContentList(): List<MangaContent> {
+    return this.groupBy { manga ->
+        epochToYear(manga.publishedChapterDate)
+    }.entries.map { entry ->
+        MangaContent(
+            year = entry.key,
+            mangaList = entry.value
+        )
+    }.sortedBy { it.year }
 }

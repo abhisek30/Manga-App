@@ -27,7 +27,7 @@ class MangaListViewModel @Inject constructor(
             val result = mangaRepository.getMangaList()
             result.onSuccess {
                 _uiState.value = _uiState.value.copy(
-                    mangaList = it
+                    mangaContent = it.toMangaContentList()
                 )
             }
         }
