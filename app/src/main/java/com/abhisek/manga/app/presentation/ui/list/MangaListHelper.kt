@@ -6,13 +6,19 @@ import com.abhisek.manga.app.domain.model.Manga
 sealed class MangaListAction {
     data class CardCta(val manga: Manga) : MangaListAction()
     data class FavoriteCta(val manga: Manga) : MangaListAction()
-    data object SortByPopularityCta : MangaListAction()
-    data object SortByScoreCta : MangaListAction()
+    data class SortCta(val sortOrder: SortOrder): MangaListAction()
 }
 
 data class MangaListState(
     val mangaContent: List<MangaContent>? = null,
+    val years: List<Int> = emptyList(),
+    val sortedList: List<Manga> = emptyList(),
+    val sortOrder: SortOrder = SortOrder.NONE,
 )
+
+enum class SortOrder {
+    NONE, SCORE_ASC, SCORE_DESC, POPULARITY_ASC, POPULARITY_DESC
+}
 
 data class MangaContent(
     val year : Int,

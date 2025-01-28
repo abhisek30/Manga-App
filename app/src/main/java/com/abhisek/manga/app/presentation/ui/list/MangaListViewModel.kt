@@ -2,6 +2,7 @@ package com.abhisek.manga.app.presentation.ui.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.abhisek.manga.app.domain.model.Manga
 import com.abhisek.manga.app.domain.repository.IMangaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -17,17 +18,70 @@ class MangaListViewModel @Inject constructor(
 
     private val _uiState: MutableStateFlow<MangaListState> = MutableStateFlow(MangaListState())
     val uiState: StateFlow<MangaListState> = _uiState
+    private var mangaList = mutableListOf<Manga>()
 
     init {
         fetchMangaList()
+    }
+
+    fun handleAction(action: MangaListAction) {
+        when (action) {
+            is MangaListAction.SortCta -> handleSortAction(action.sortOrder)
+
+            else -> {
+
+            }
+        }
+    }
+
+    private fun handleSortAction(sortOrder: SortOrder) {
+        when (sortOrder) {
+            SortOrder.SCORE_ASC -> {
+                _uiState.value = _uiState.value.copy(
+                    sortOrder = sortOrder,
+                    sortedList = mangaList.sortedBy { it.score }
+                )
+            }
+
+            SortOrder.SCORE_DESC -> {
+                _uiState.value = _uiState.value.copy(
+                    sortOrder = sortOrder,
+                    sortedList = mangaList.sortedByDescending { it.score }
+                )
+            }
+
+            SortOrder.POPULARITY_ASC -> {
+                _uiState.value = _uiState.value.copy(
+                    sortOrder = sortOrder,
+                    sortedList = mangaList.sortedBy { it.popularity }
+                )
+            }
+
+            SortOrder.POPULARITY_DESC -> {
+                _uiState.value = _uiState.value.copy(
+                    sortOrder = sortOrder,
+                    sortedList = mangaList.sortedByDescending { it.popularity }
+                )
+            }
+
+            SortOrder.NONE -> {
+                _uiState.value = _uiState.value.copy(
+                    sortOrder = sortOrder,
+                    sortedList = emptyList()
+                )
+            }
+        }
     }
 
     private fun fetchMangaList() {
         viewModelScope.launch(Dispatchers.IO) {
             val result = mangaRepository.getMangaList()
             result.onSuccess {
+                mangaList = it.toMutableList()
+                val mangaContent = it.toMangaContentList()
                 _uiState.value = _uiState.value.copy(
-                    mangaContent = it.toMangaContentList()
+                    mangaContent = mangaContent,
+                    years = mangaContent.map { it.year },
                 )
             }
         }
