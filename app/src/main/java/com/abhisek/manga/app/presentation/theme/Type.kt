@@ -1,4 +1,4 @@
-package com.abhisek.manga.app.ui.theme
+package com.abhisek.manga.app.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

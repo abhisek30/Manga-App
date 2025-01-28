@@ -1,4 +1,4 @@
-package com.abhisek.manga.app.ui.theme
+package com.abhisek.manga.app.presentation.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
