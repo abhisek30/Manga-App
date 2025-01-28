@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.demo.example.myapplication"
+    namespace = "com.abhisek.manga.app"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.demo.example.myapplication"
+        applicationId = "com.abhisek.manga.app"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
