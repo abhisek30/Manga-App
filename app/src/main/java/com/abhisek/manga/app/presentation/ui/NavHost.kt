@@ -5,7 +5,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.abhisek.manga.app.presentation.ui.list.MangaListContent
+import com.abhisek.manga.app.presentation.ui.details.MangaDetailsScreen
+import com.abhisek.manga.app.presentation.ui.list.MangaListScreen
 import kotlinx.serialization.Serializable
 
 @Composable
@@ -19,13 +20,17 @@ fun NavHost(modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
         composable<Screen.MangaListScreen> {
-            MangaListContent(navigateToDetails = {
+            MangaListScreen(navigateToDetails = {
                 navController.navigate(Screen.MangaDetailsScreen(it))
             })
         }
 
         composable<Screen.MangaDetailsScreen> { backStackRoute ->
             val mangaDetailsScreen = backStackRoute.toRoute<Screen.MangaDetailsScreen>()
+            MangaDetailsScreen(
+                modifier = Modifier,
+                id = mangaDetailsScreen.id
+            )
         }
     }
 }

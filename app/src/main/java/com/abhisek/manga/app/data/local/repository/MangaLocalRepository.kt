@@ -47,4 +47,15 @@ class MangaLocalRepository @Inject constructor(
             return Result.failure(e)
         }
     }
+
+    override fun getMangaDetails(id: String): Flow<Result<Manga>> =
+        mangaDao.getMangaById(id).map { mangaEntity ->
+            try {
+                mangaEntity?.let {
+                    Result.success(it.toDomain())
+                } ?: Result.failure(Exception("Manga not found"))
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
 }

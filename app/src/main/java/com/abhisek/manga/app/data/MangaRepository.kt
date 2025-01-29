@@ -49,4 +49,8 @@ class MangaRepository @Inject constructor(
     override suspend fun updateManga(manga: MangaEntity): Result<Any> {
         return mangaLocalRepository.updateManga(manga)
     }
+
+    override fun getMangaDetails(id: String): Flow<Result<Manga>> {
+        return mangaLocalRepository.getMangaDetails(id)
+    }
 }

@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.onEach
 
 
 @Composable
-fun MangaListContent(modifier: Modifier = Modifier, navigateToDetails: (String) -> Unit) {
+fun MangaListScreen(modifier: Modifier = Modifier, navigateToDetails: (String) -> Unit) {
     val viewmodel = hiltViewModel<MangaListViewModel>()
     val uiState = viewmodel.uiState.collectAsState()
     Scaffold(topBar = {
@@ -88,8 +88,8 @@ fun MangaListContent(modifier: Modifier = Modifier, navigateToDetails: (String) 
 
 @Preview
 @Composable
-private fun MangaListContentPreview() {
-    MangaListContent(
+private fun MangaListScreenPreview() {
+    MangaListScreen(
         Modifier
             .fillMaxSize()
             .background(Color.White)

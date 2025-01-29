@@ -19,4 +19,7 @@ interface MangaDao {
 
     @Update
     suspend fun updateManga(manga: MangaEntity)
+
+    @Query("SELECT * FROM manga_table WHERE id = :id")
+    fun getMangaById(id: String): Flow<MangaEntity?>
 }

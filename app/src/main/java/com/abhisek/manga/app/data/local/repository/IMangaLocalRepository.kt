@@ -9,4 +9,5 @@ interface IMangaLocalRepository {
     fun getMangaListAsFlow(): Flow<Result<List<Manga>>>
     suspend fun insertMangaList(mangaList: List<MangaEntity>): Result<Any>
     suspend fun updateManga(manga: MangaEntity): Result<Any>
+    fun getMangaDetails(id: String): Flow<Result<Manga>>
 }
