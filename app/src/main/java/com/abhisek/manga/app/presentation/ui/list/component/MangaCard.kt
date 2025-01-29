@@ -37,6 +37,7 @@ fun MangaCard(
     modifier: Modifier = Modifier,
     manga: Manga,
     onClick: () -> Unit,
+    onFavoriteCta: () -> Unit,
 ) {
     Card(
         modifier = modifier
@@ -95,6 +96,9 @@ fun MangaCard(
                 imageVector = if (manga.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                 tint = Color.Red,
                 contentDescription = null,
+                modifier = Modifier.clickable {
+                    onFavoriteCta()
+                }
             )
             Spacer(Modifier.weight(1f))
             Text(
@@ -125,6 +129,7 @@ private fun MangaCardPreview() {
             isFavorite = false,
             isRead = false
         ),
-        onClick = {}
+        onClick = {},
+        onFavoriteCta = {},
     )
 }

@@ -1,7 +1,9 @@
 package com.abhisek.manga.app.presentation.ui.list
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.abhisek.manga.app.domain.mapper.toEntity
 import com.abhisek.manga.app.domain.model.Manga
 import com.abhisek.manga.app.domain.repository.IMangaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,9 +30,17 @@ class MangaListViewModel @Inject constructor(
         when (action) {
             is MangaListAction.SortCta -> handleSortAction(action.sortOrder)
 
+            is MangaListAction.FavoriteCta -> handleFavoriteCta(action.manga)
+
             else -> {
 
             }
+        }
+    }
+
+    private fun handleFavoriteCta(manga: Manga) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = mangaRepository.updateManga(manga.toEntity().copy(isFavorite = !manga.isFavorite))
         }
     }
 
@@ -83,6 +93,22 @@ class MangaListViewModel @Inject constructor(
                     mangaContent = mangaContent,
                     years = mangaContent.map { it.year },
                 )
+                fetchMangaListAsFlow()
+            }
+        }
+    }
+
+    private fun fetchMangaListAsFlow() {
+        viewModelScope.launch(Dispatchers.IO) {
+            mangaRepository.getMangaListAsFlow().collect {
+                it.onSuccess {
+                    mangaList = it.toMutableList()
+                    val mangaContent = it.toMangaContentList()
+                    _uiState.value = _uiState.value.copy(
+                        mangaContent = mangaContent,
+                        years = mangaContent.map { it.year },
+                    )
+                }
             }
         }
     }

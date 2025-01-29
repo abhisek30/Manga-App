@@ -35,18 +35,24 @@ fun MangaListContent(modifier: Modifier = Modifier, navigateToDetails: () -> Uni
                 mangaContent.indices.toList(),
                 smoothScroll = true,
             )
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
                 if (uiState.value.sortOrder == SortOrder.NONE) {
                     YearTabBar(
                         years = uiState.value.years,
                         selectedTabIndex = selectedTabIndex,
                         onTabClicked = { index, _ -> setSelectedTabIndex(index) }
                     )
-                    MangaContentLazyList(mangaContent, lazyListState)
+                    MangaContentLazyList(mangaContent, lazyListState, onFavoriteCta = { manga ->
+                        viewmodel.handleAction(MangaListAction.FavoriteCta(manga))
+                    })
                 } else {
-                    MangaLazyList(uiState.value.sortedList)
+                    MangaLazyList(uiState.value.sortedList, onFavoriteCta = { manga ->
+                        viewmodel.handleAction(MangaListAction.FavoriteCta(manga))
+                    })
                 }
             }
         } ?: run {

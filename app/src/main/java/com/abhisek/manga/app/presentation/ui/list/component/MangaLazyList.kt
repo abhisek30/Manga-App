@@ -18,6 +18,7 @@ fun MangaContentLazyList(
     mangaContent: List<MangaContent>,
     listState: LazyListState = rememberLazyListState(),
     modifier: Modifier = Modifier,
+    onFavoriteCta: (Manga) -> Unit,
 ) {
     LazyColumn(
         state = listState,
@@ -33,7 +34,8 @@ fun MangaContentLazyList(
                 MangaCard(
                     modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp),
                     manga = it,
-                    onClick = {}
+                    onClick = {onFavoriteCta(it)},
+                    onFavoriteCta = {onFavoriteCta(it)}
                 )
             }
         }
@@ -45,6 +47,7 @@ fun MangaLazyList(
     manga: List<Manga>,
     listState: LazyListState = rememberLazyListState(),
     modifier: Modifier = Modifier,
+    onFavoriteCta: (Manga) -> Unit,
 ) {
     LazyColumn(
         state = listState,
@@ -55,7 +58,8 @@ fun MangaLazyList(
             MangaCard(
                 modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp),
                 manga = mangaContent,
-                onClick = {}
+                onClick = {onFavoriteCta(mangaContent)},
+                onFavoriteCta = {onFavoriteCta(mangaContent)}
             )
         }
     }

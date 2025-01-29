@@ -4,7 +4,9 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.abhisek.manga.app.data.local.entity.MangaEntity
+import kotlinx.coroutines.flow.Flow
 
 
 @Dao
@@ -13,5 +15,8 @@ interface MangaDao {
     suspend fun insertMangaList(mangaList: List<MangaEntity>)
 
     @Query("SELECT * FROM manga_table")
-    suspend fun getAllManga(): List<MangaEntity>
+    fun getAllManga(): Flow<List<MangaEntity>>
+
+    @Update
+    suspend fun updateManga(manga: MangaEntity)
 }
