@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,10 +20,12 @@ import com.abhisek.manga.app.presentation.ui.list.component.MangaLazyList
 import com.abhisek.manga.app.presentation.ui.list.component.TopAppBar
 import com.abhisek.manga.app.presentation.ui.list.component.YearTabBar
 import com.ahmadhamwi.tabsync_compose.lazyListTabSync
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 
 
 @Composable
-fun MangaListContent(modifier: Modifier = Modifier, navigateToDetails: () -> Unit) {
+fun MangaListContent(modifier: Modifier = Modifier, navigateToDetails: (String) -> Unit) {
     val viewmodel = hiltViewModel<MangaListViewModel>()
     val uiState = viewmodel.uiState.collectAsState()
     Scaffold(topBar = {
@@ -48,10 +51,14 @@ fun MangaListContent(modifier: Modifier = Modifier, navigateToDetails: () -> Uni
                     )
                     MangaContentLazyList(mangaContent, lazyListState, onFavoriteCta = { manga ->
                         viewmodel.handleAction(MangaListAction.FavoriteCta(manga))
+                    }, onClickCta = {
+                        viewmodel.handleAction(MangaListAction.CardCta(it))
                     })
                 } else {
                     MangaLazyList(uiState.value.sortedList, onFavoriteCta = { manga ->
                         viewmodel.handleAction(MangaListAction.FavoriteCta(manga))
+                    }, onClickCta = {
+                        viewmodel.handleAction(MangaListAction.CardCta(it))
                     })
                 }
             }
@@ -66,6 +73,15 @@ fun MangaListContent(modifier: Modifier = Modifier, navigateToDetails: () -> Uni
                 CircularProgressIndicator()
             }
         }
+    }
+
+    LaunchedEffect(Unit) {
+        viewmodel.uiEffect.onEach {
+            when (it) {
+                is MangaListEffect.ShowToast -> {}
+                is MangaListEffect.NavigateToDetails -> navigateToDetails(it.id)
+            }
+        }.collect()
     }
 }
 

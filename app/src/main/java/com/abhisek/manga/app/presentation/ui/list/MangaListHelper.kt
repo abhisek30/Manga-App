@@ -16,6 +16,11 @@ data class MangaListState(
     val sortOrder: SortOrder = SortOrder.NONE,
 )
 
+sealed class MangaListEffect {
+    data class ShowToast(val message: String) : MangaListEffect()
+    data class NavigateToDetails(val id: String): MangaListEffect()
+}
+
 enum class SortOrder {
     NONE, SCORE_ASC, SCORE_DESC, POPULARITY_ASC, POPULARITY_DESC
 }

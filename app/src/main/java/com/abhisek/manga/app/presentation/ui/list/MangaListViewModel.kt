@@ -1,6 +1,5 @@
 package com.abhisek.manga.app.presentation.ui.list
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.abhisek.manga.app.domain.mapper.toEntity
@@ -8,7 +7,9 @@ import com.abhisek.manga.app.domain.model.Manga
 import com.abhisek.manga.app.domain.repository.IMangaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,6 +23,9 @@ class MangaListViewModel @Inject constructor(
     val uiState: StateFlow<MangaListState> = _uiState
     private var mangaList = mutableListOf<Manga>()
 
+    private val _uiEffect = MutableSharedFlow<MangaListEffect>()
+    val uiEffect: SharedFlow<MangaListEffect> = _uiEffect
+
     init {
         fetchMangaList()
     }
@@ -32,15 +36,18 @@ class MangaListViewModel @Inject constructor(
 
             is MangaListAction.FavoriteCta -> handleFavoriteCta(action.manga)
 
-            else -> {
-
+            is MangaListAction.CardCta -> {
+                viewModelScope.launch {
+                    _uiEffect.emit(MangaListEffect.NavigateToDetails(action.manga.id))
+                }
             }
         }
     }
 
     private fun handleFavoriteCta(manga: Manga) {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = mangaRepository.updateManga(manga.toEntity().copy(isFavorite = !manga.isFavorite))
+            val result =
+                mangaRepository.updateManga(manga.toEntity().copy(isFavorite = !manga.isFavorite))
         }
     }
 
