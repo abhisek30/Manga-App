@@ -41,6 +41,8 @@ class MangaListViewModel @Inject constructor(
                     _uiEffect.emit(MangaListEffect.NavigateToDetails(action.manga.id))
                 }
             }
+
+            is MangaListAction.Reload -> fetchMangaList()
         }
     }
 
@@ -92,6 +94,11 @@ class MangaListViewModel @Inject constructor(
 
     private fun fetchMangaList() {
         viewModelScope.launch(Dispatchers.IO) {
+            _uiState.value = _uiState.value.copy(
+                isError = false,
+                mangaContent = null,
+                years = emptyList(),
+            )
             val result = mangaRepository.getMangaList()
             result.onSuccess {
                 mangaList = it.toMutableList()
@@ -99,8 +106,13 @@ class MangaListViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(
                     mangaContent = mangaContent,
                     years = mangaContent.map { it.year },
+                    isError = false,
                 )
                 fetchMangaListAsFlow()
+            }.onFailure {
+                _uiState.value = _uiState.value.copy(
+                    isError = true,
+                )
             }
         }
     }
@@ -114,6 +126,11 @@ class MangaListViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         mangaContent = mangaContent,
                         years = mangaContent.map { it.year },
+                        isError = false,
+                    )
+                }.onFailure {
+                    _uiState.value = _uiState.value.copy(
+                        isError = true,
                     )
                 }
             }

@@ -11,7 +11,3 @@ sealed class MangaDetailsAction {
 data class MangaDetailsState(
     val manga: Manga? = null,
 )
-
-sealed class MangaDetailsEffect {
-    data class ShowToast(val message: String) : MangaDetailsEffect()
-}

@@ -25,9 +25,6 @@ class MangaDetailsViewModel @Inject constructor(
     private lateinit var id: String
     private lateinit var manga: Manga
 
-    private val _uiEffect = MutableSharedFlow<MangaDetailsEffect>()
-    val uiEffect: SharedFlow<MangaDetailsEffect> = _uiEffect
-
     fun handleAction(action: MangaDetailsAction) {
         when (action) {
             is MangaDetailsAction.Init -> {

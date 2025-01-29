@@ -7,6 +7,7 @@ sealed class MangaListAction {
     data class CardCta(val manga: Manga) : MangaListAction()
     data class FavoriteCta(val manga: Manga) : MangaListAction()
     data class SortCta(val sortOrder: SortOrder): MangaListAction()
+    data object Reload: MangaListAction()
 }
 
 data class MangaListState(
@@ -14,10 +15,10 @@ data class MangaListState(
     val years: List<Int> = emptyList(),
     val sortedList: List<Manga> = emptyList(),
     val sortOrder: SortOrder = SortOrder.NONE,
+    val isError: Boolean = false,
 )
 
 sealed class MangaListEffect {
-    data class ShowToast(val message: String) : MangaListEffect()
     data class NavigateToDetails(val id: String): MangaListEffect()
 }
 
