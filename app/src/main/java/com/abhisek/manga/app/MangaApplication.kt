@@ -1,4 +1,4 @@
-package com.abhisek.manga.app.presentation
+package com.abhisek.manga.app
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
