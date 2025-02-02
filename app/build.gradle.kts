@@ -84,6 +84,5 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
-    implementation("io.github.ahmad-hamwi:tabsync-compose:1.0.0")
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 }

@@ -23,11 +23,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.abhisek.manga.app.core.util.syncTabsWithLazyList
 import com.abhisek.manga.app.presentation.ui.list.component.MangaContentLazyList
 import com.abhisek.manga.app.presentation.ui.list.component.MangaLazyList
 import com.abhisek.manga.app.presentation.ui.list.component.TopAppBar
 import com.abhisek.manga.app.presentation.ui.list.component.YearTabBar
-import com.ahmadhamwi.tabsync_compose.lazyListTabSync
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
@@ -70,9 +70,8 @@ fun MangaListScreen(modifier: Modifier = Modifier, navigateToDetails: (String) -
             }
         } else {
             uiState.value.mangaContent?.takeIf { it.isNotEmpty() }?.let { mangaContent ->
-                val (selectedTabIndex, setSelectedTabIndex, lazyListState) = lazyListTabSync(
-                    mangaContent.indices.toList(),
-                    smoothScroll = true,
+                val tabSyncState = syncTabsWithLazyList(
+                    mangaContent.indices.toList()
                 )
                 Column(
                     modifier = Modifier
@@ -82,10 +81,10 @@ fun MangaListScreen(modifier: Modifier = Modifier, navigateToDetails: (String) -
                     if (uiState.value.sortOrder == SortOrder.NONE) {
                         YearTabBar(
                             years = uiState.value.years,
-                            selectedTabIndex = selectedTabIndex,
-                            onTabClicked = { index, _ -> setSelectedTabIndex(index) }
+                            selectedTabIndex = tabSyncState.selectedTabIndex,
+                            onTabClicked = { index, _ -> tabSyncState.onTabClicked(index) }
                         )
-                        MangaContentLazyList(mangaContent, lazyListState, onFavoriteCta = { manga ->
+                        MangaContentLazyList(mangaContent, tabSyncState.lazyListState, onFavoriteCta = { manga ->
                             viewmodel.handleAction(MangaListAction.FavoriteCta(manga))
                         }, onClickCta = {
                             viewmodel.handleAction(MangaListAction.CardCta(it))
