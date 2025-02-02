@@ -44,7 +44,7 @@ fun MangaListScreen(modifier: Modifier = Modifier, navigateToDetails: (String) -
             viewmodel.handleAction(MangaListAction.SortCta(sort))
         })
     }, modifier = modifier.fillMaxSize()) { innerPadding ->
-        if(uiState.value.isError) {
+        if (uiState.value.isError) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -69,7 +69,7 @@ fun MangaListScreen(modifier: Modifier = Modifier, navigateToDetails: (String) -
                 }
             }
         } else {
-            uiState.value.mangaContent?.let { mangaContent ->
+            uiState.value.mangaContent?.takeIf { it.isNotEmpty() }?.let { mangaContent ->
                 val (selectedTabIndex, setSelectedTabIndex, lazyListState) = lazyListTabSync(
                     mangaContent.indices.toList(),
                     smoothScroll = true,
