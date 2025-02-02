@@ -54,10 +54,13 @@ class MangaListViewModel @Inject constructor(
     }
 
     private fun handleSortAction(sortOrder: SortOrder) {
-        _uiState.value = _uiState.value.copy(
-            sortOrder = sortOrder,
-            sortedList = mangaList.sortByOrder(sortOrder)
-        )
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                sortOrder = sortOrder,
+                sortedList = mangaList.sortByOrder(sortOrder)
+            )
+            _uiEffect.emit(MangaListEffect.ResetSortListState)
+        }
     }
 
     private fun List<Manga>.sortByOrder(sortOrder: SortOrder): List<Manga> {

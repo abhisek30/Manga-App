@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -30,13 +32,14 @@ import com.abhisek.manga.app.presentation.ui.list.component.TopAppBar
 import com.abhisek.manga.app.presentation.ui.list.component.YearTabBar
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun MangaListScreen(modifier: Modifier = Modifier, navigateToDetails: (String) -> Unit) {
     val viewmodel = hiltViewModel<MangaListViewModel>()
     val uiState = viewmodel.uiState.collectAsState()
-
+    val sortListState: LazyListState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
     Scaffold(topBar = {
@@ -84,17 +87,23 @@ fun MangaListScreen(modifier: Modifier = Modifier, navigateToDetails: (String) -
                             selectedTabIndex = tabSyncState.selectedTabIndex,
                             onTabClicked = { index, _ -> tabSyncState.onTabClicked(index) }
                         )
-                        MangaContentLazyList(mangaContent, tabSyncState.lazyListState, onFavoriteCta = { manga ->
-                            viewmodel.handleAction(MangaListAction.FavoriteCta(manga))
-                        }, onClickCta = {
-                            viewmodel.handleAction(MangaListAction.CardCta(it))
-                        })
+                        MangaContentLazyList(
+                            mangaContent,
+                            tabSyncState.lazyListState,
+                            onFavoriteCta = { manga ->
+                                viewmodel.handleAction(MangaListAction.FavoriteCta(manga))
+                            },
+                            onClickCta = {
+                                viewmodel.handleAction(MangaListAction.CardCta(it))
+                            })
                     } else {
                         MangaLazyList(uiState.value.sortedList, onFavoriteCta = { manga ->
                             viewmodel.handleAction(MangaListAction.FavoriteCta(manga))
                         }, onClickCta = {
                             viewmodel.handleAction(MangaListAction.CardCta(it))
-                        })
+                        },
+                            listState = sortListState
+                        )
                     }
                 }
             } ?: run {
@@ -105,9 +114,9 @@ fun MangaListScreen(modifier: Modifier = Modifier, navigateToDetails: (String) -
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if(uiState.value.mangaContent == null) {
+                    if (uiState.value.mangaContent == null) {
                         CircularProgressIndicator()
-                    } else if(uiState.value.mangaContent?.isEmpty() == true) {
+                    } else if (uiState.value.mangaContent?.isEmpty() == true) {
                         Text("Empty list found, please try later")
                     }
                 }
@@ -119,6 +128,13 @@ fun MangaListScreen(modifier: Modifier = Modifier, navigateToDetails: (String) -
         viewmodel.uiEffect.onEach {
             when (it) {
                 is MangaListEffect.NavigateToDetails -> navigateToDetails(it.id)
+                is MangaListEffect.ResetSortListState -> {
+                    if(uiState.value.sortedList.isNotEmpty()) {
+                        scope.launch {
+                            sortListState.scrollToItem(0)
+                        }
+                    }
+                }
             }
         }.collect()
     }

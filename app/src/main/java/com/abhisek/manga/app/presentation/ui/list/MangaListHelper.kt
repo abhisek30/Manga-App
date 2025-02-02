@@ -20,6 +20,7 @@ data class MangaListState(
 
 sealed class MangaListEffect {
     data class NavigateToDetails(val id: String): MangaListEffect()
+    data object ResetSortListState : MangaListEffect()
 }
 
 enum class SortOrder {
