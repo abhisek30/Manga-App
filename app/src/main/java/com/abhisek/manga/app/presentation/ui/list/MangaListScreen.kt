@@ -106,7 +106,11 @@ fun MangaListScreen(modifier: Modifier = Modifier, navigateToDetails: (String) -
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    CircularProgressIndicator()
+                    if(uiState.value.mangaContent == null) {
+                        CircularProgressIndicator()
+                    } else if(uiState.value.mangaContent?.isEmpty() == true) {
+                        Text("Empty list found, please try later")
+                    }
                 }
             }
         }
