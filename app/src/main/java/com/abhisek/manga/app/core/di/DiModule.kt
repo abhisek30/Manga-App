@@ -9,29 +9,37 @@ import com.abhisek.manga.app.data.local.repository.IMangaLocalRepository
 import com.abhisek.manga.app.data.local.repository.MangaLocalRepository
 import com.abhisek.manga.app.data.remote.repository.IMangaRemoteRepository
 import com.abhisek.manga.app.data.remote.repository.MangaRemoteRepository
+import com.abhisek.manga.app.data.remote.service.MangaService
 import com.abhisek.manga.app.domain.repository.IMangaRepository
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import retrofit2.Retrofit
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DiModule {
+abstract class BindsModule {
 
-    @Provides
-    @Singleton
-    fun provideRemoteRepository(): IMangaRemoteRepository {
-        return MangaRemoteRepository()
-    }
+        @Binds
+        @Singleton
+        abstract fun bindRemoteRepository(
+            remoteRepositoryImpl: MangaRemoteRepository
+        ): IMangaRemoteRepository
 
-    @Provides
-    @Singleton
-    fun provideLocalRepository(dao: MangaDao): IMangaLocalRepository {
-        return MangaLocalRepository(dao)
-    }
+        @Binds
+        @Singleton
+        abstract fun bindLocalRepository(
+            localRepositoryImpl: MangaLocalRepository
+        ): IMangaLocalRepository
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+object ProvidesModule {
 
     @Provides
     @Singleton
@@ -57,5 +65,11 @@ object DiModule {
     @Singleton
     fun provideMangaDao(database: MangaDatabase): MangaDao {
         return database.mangaDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideService(retrofit: Retrofit): MangaService {
+        return retrofit.create(MangaService::class.java)
     }
 }

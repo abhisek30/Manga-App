@@ -1,13 +1,16 @@
 package com.abhisek.manga.app.data.remote.repository
 
-import com.abhisek.manga.app.core.network.RetrofitClient
 import com.abhisek.manga.app.data.remote.mapper.toDomainList
+import com.abhisek.manga.app.data.remote.service.MangaService
 import com.abhisek.manga.app.domain.model.Manga
+import javax.inject.Inject
 
-class MangaRemoteRepository : IMangaRemoteRepository {
+class MangaRemoteRepository @Inject constructor(
+    private val apiService: MangaService,
+) : IMangaRemoteRepository {
     override suspend fun getMangaList(): Result<List<Manga>> {
         return try {
-            val result = RetrofitClient.apiService.getMangaList()
+            val result = apiService.getMangaList()
             if (result.isSuccessful) {
                 result.body()?.let { mangaDtoList ->
                     Result.success(mangaDtoList.toDomainList())
