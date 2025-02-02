@@ -27,7 +27,7 @@ class MangaListViewModel @Inject constructor(
     val uiEffect: SharedFlow<MangaListEffect> = _uiEffect
 
     init {
-        fetchMangaList()
+        fetchMangaListAsFlow()
     }
 
     fun handleAction(action: MangaListAction) {
@@ -42,7 +42,7 @@ class MangaListViewModel @Inject constructor(
                 }
             }
 
-            is MangaListAction.Reload -> fetchMangaList()
+            is MangaListAction.Reload -> fetchMangaListAsFlow()
         }
     }
 
@@ -54,71 +54,29 @@ class MangaListViewModel @Inject constructor(
     }
 
     private fun handleSortAction(sortOrder: SortOrder) {
-        when (sortOrder) {
-            SortOrder.SCORE_ASC -> {
-                _uiState.value = _uiState.value.copy(
-                    sortOrder = sortOrder,
-                    sortedList = mangaList.sortedBy { it.score }
-                )
-            }
+        _uiState.value = _uiState.value.copy(
+            sortOrder = sortOrder,
+            sortedList = mangaList.sortByOrder(sortOrder)
+        )
+    }
 
-            SortOrder.SCORE_DESC -> {
-                _uiState.value = _uiState.value.copy(
-                    sortOrder = sortOrder,
-                    sortedList = mangaList.sortedByDescending { it.score }
-                )
-            }
-
-            SortOrder.POPULARITY_ASC -> {
-                _uiState.value = _uiState.value.copy(
-                    sortOrder = sortOrder,
-                    sortedList = mangaList.sortedBy { it.popularity }
-                )
-            }
-
-            SortOrder.POPULARITY_DESC -> {
-                _uiState.value = _uiState.value.copy(
-                    sortOrder = sortOrder,
-                    sortedList = mangaList.sortedByDescending { it.popularity }
-                )
-            }
-
-            SortOrder.NONE -> {
-                _uiState.value = _uiState.value.copy(
-                    sortOrder = sortOrder,
-                    sortedList = emptyList()
-                )
-            }
+    private fun List<Manga>.sortByOrder(sortOrder: SortOrder): List<Manga> {
+        return when (sortOrder) {
+            SortOrder.SCORE_ASC -> this.sortedBy { it.score }
+            SortOrder.SCORE_DESC -> this.sortedByDescending { it.score }
+            SortOrder.POPULARITY_ASC -> this.sortedBy { it.popularity }
+            SortOrder.POPULARITY_DESC -> this.sortedByDescending { it.popularity }
+            SortOrder.NONE -> emptyList()
         }
     }
 
-    private fun fetchMangaList() {
+    private fun fetchMangaListAsFlow() {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = _uiState.value.copy(
                 isError = false,
                 mangaContent = null,
                 years = emptyList(),
             )
-            val result = mangaRepository.getMangaList()
-            result.onSuccess {
-                mangaList = it.toMutableList()
-                val mangaContent = it.toMangaContentList()
-                _uiState.value = _uiState.value.copy(
-                    mangaContent = mangaContent,
-                    years = mangaContent.map { it.year },
-                    isError = false,
-                )
-                fetchMangaListAsFlow()
-            }.onFailure {
-                _uiState.value = _uiState.value.copy(
-                    isError = true,
-                )
-            }
-        }
-    }
-
-    private fun fetchMangaListAsFlow() {
-        viewModelScope.launch(Dispatchers.IO) {
             mangaRepository.getMangaListAsFlow().collect {
                 it.onSuccess {
                     mangaList = it.toMutableList()
@@ -127,6 +85,8 @@ class MangaListViewModel @Inject constructor(
                         mangaContent = mangaContent,
                         years = mangaContent.map { it.year },
                         isError = false,
+                        sortOrder = _uiState.value.sortOrder,
+                        sortedList = mangaList.sortByOrder(_uiState.value.sortOrder)
                     )
                 }.onFailure {
                     _uiState.value = _uiState.value.copy(

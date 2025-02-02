@@ -12,14 +12,6 @@ import javax.inject.Inject
 class MangaLocalRepository @Inject constructor(
     private val mangaDao: MangaDao,
 ) : IMangaLocalRepository {
-    override suspend fun getMangaList(): Result<List<Manga>> {
-        return try {
-            val result = mangaDao.getAllManga().first()
-            Result.success(result.toDomain())
-        } catch (e: Exception) {
-            return Result.failure(e)
-        }
-    }
 
     override fun getMangaListAsFlow(): Flow<Result<List<Manga>>> =
         mangaDao.getAllManga().map { mangaEntities ->
