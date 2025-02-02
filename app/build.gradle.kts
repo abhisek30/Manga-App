@@ -34,6 +34,7 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
@@ -78,10 +79,11 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
-    implementation("androidx.room:room-runtime:2.5.2")
-    ksp("androidx.room:room-compiler:2.5.2")
-    implementation("androidx.room:room-ktx:2.5.2")
-    implementation("io.coil-kt.coil3:coil-compose:3.0.4")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.4")
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
     implementation("io.github.ahmad-hamwi:tabsync-compose:1.0.0")
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 }
